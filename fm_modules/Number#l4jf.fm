@@ -1,0 +1,81 @@
+import Bool#zvwm
+import String#M_Ff
+
+number_equal(a : Number, b : Number) : Bool
+  if a === b then
+    true
+  else
+    false
+
+digit_to_char(n: Number) : Number
+  if n < 10 then
+    n + '0'
+  else
+    (n - 10) + 'a'
+
+number_to_string.aux(base: Number, n: Number) : String -> String
+  if n === 0 then
+    (x) => x
+  else
+    let c = digit_to_char(n % base)
+    let f = number_to_string.aux(base, (n \ base) || 0)
+    (x) => f(cons(_ c, x))
+
+number_to_string(base: Number, n : Number) : String
+  if n === 0 then
+    "0"
+  else
+    number_to_string.aux(base, n, [])
+
+is_true(bool: Bool) : Number
+  case bool
+  | true  => 1
+  | false => 0
+
+is_false(bool: Bool) : Number
+  case bool
+  | true  => 0
+  | false => 1
+
+pi : Number
+  3.141592653589793
+
+tau 
+  6.283185307179586
+
+abs(x : Number) : Number
+  if x < 0 then
+    x * -1
+  else
+    x
+    
+floor(x : Number) : Number
+  (x - (x % 1)) - (if x < 0 then 1 else 0)
+
+min(a: Number, b: Number) : Number
+  if a < b then
+    a
+  else
+    b
+
+max(a: Number, b: Number) : Number
+  if a > b then
+    a
+  else
+    b
+
+// Is a <= b?
+gte(a: Number, b: Number) : Number
+  (a > b) || (a === b)
+
+// Is a >= b?
+lte(a: Number, b: Number) : Number
+  (a < b) || (a === b)
+
+// Is x inside the a..b range, with `b` exclusive?
+is_between(a: Number, b: Number, x: Number) : Number
+  (a === x) || ((a < x) && (x < b))
+
+// Is x inside the a..b range, inclusive?
+is_within(a: Number, b: Number, x: Number) : Number
+  (a === x) || (a === b) || ((a < x) && (x < b))

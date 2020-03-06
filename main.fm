@@ -1,0 +1,110 @@
+import Base#
+
+T Suit
+| Clubs
+| Diamonds
+| Hearts
+| Spades 
+
+T Rank
+| Deuce
+| Three
+| Four
+| Five 
+| Six
+| Seven
+| Eight
+| Nine 
+| Ten 
+| Jack
+| Queen
+| King 
+| Ace 
+
+T Card 
+| card ( rank : Rank, suit : Suit ) 
+
+getRank(c : Card) : Rank 
+	case c | card c.rank
+
+getSuit(c : Card) : Suit
+	case c | card c.suit
+
+showSuit(suit : Suit) : String
+	case suit
+	| Clubs    => "♣"
+	| Diamonds => "♦"
+	| Hearts   => "♥"
+	| Spades   => "♠"
+
+showRank(rank : Rank) : String 
+	case rank
+	| Deuce => "2"
+	| Three => "3"
+	| Four  => "4"
+	| Five  => "5"
+	| Six   => "6"
+	| Seven => "7"
+	| Eight => "8"
+	| Nine  => "9"
+	| Ten   => "T"
+	| Jack  => "J"
+	| Queen => "Q"
+	| King  => "K"
+	| Ace   => "A"
+
+
+showCard(c : Card) : String 
+	case c 
+	| card => concat(_ showRank (c.rank), showSuit (c.suit))
+
+isClubs(c : Card) : Bool
+  case getSuit(c) as suit 
+	| Clubs    => true 
+  | Diamonds => false 
+	| Hearts   => false
+	| Spades   => false
+
+isDiamonds(c : Card) : Bool
+ 	case getSuit(c) as suit 
+	| Clubs    => false 
+	| Diamonds => true  
+	| Hearts   => false  
+	| Spades   => false
+
+isHearts(c : Card) : Bool 
+	case getSuit(c) as suit 
+	| Clubs    => false 
+	| Diamonds => false 
+	| Hearts   => true 
+	| Spades   => false
+
+isSpades(c : Card) : Bool 
+	case getSuit(c) as suit  
+	| Clubs    => false 
+	| Diamonds => false   
+	| Hearts   => false  
+	| Spades   => true
+
+
+split_by_suit(cards : List(Card)) : List(List(Card))
+	case cards 
+	with cards : List(Card)
+	| nil => nil(_)
+	| cons => 
+		let clubs    = filter (_ isClubs)    (cards)
+		let diamonds = filter (_ isDiamonds) (cards)
+		let hearts   = filter (_ isHearts)   (cards)
+		let spades   = filter (_ isSpades)   (cards)
+		[ clubs, diamonds, hearts, spades ]
+
+someCards : List(Card)
+	[ card(Ace,Spades)
+	, card(Ace,Clubs)
+	, card(Ace,Diamonds)
+	, card(Ace,Hearts)
+	]
+
+
+someSplitedCards : List(List(Card))
+	split_by_suit(someCards)

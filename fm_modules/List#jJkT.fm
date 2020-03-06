@@ -1,0 +1,145 @@
+// List.fm
+// =======
+// 
+// Linked lists.
+
+import Equal#j0AB
+import Maybe#SzO.
+import Nat#u5c3
+
+// Definition
+// ----------
+
+T List{A}
+| nil
+| cons(head : A, tail : List(A))
+
+// Operations
+// ----------
+
+// Returns the head
+head(A; x : A, xs : List(A)) : A
+  case xs
+  | nil  => x
+  | cons => xs.head
+
+// Returns the tail
+tail(A; xs : List(A)) : List(A)
+  case xs
+  | nil  => nil(_)
+  | cons => xs.tail
+
+// Returns the first element and the rest in a pair
+take(A; x : A, xs : List(A)) : Pair(A, List(A))
+  case xs
+  | nil  => pair(__ x, nil(_))
+  | cons => pair(__ xs.head, xs.tail)
+
+// Gets the element at an index
+at(A; n : Nat, xs : List(A)) : Maybe(A)
+  case xs
+  with n : Nat
+  | nil  => none(_)
+  | cons => case n
+    | zero => some(_ xs.head)
+    | succ => at(_ n.pred, xs.tail)
+
+// Finds the first occurrence
+find(A; fn: A -> Bool, xs: List(A)) : Maybe(A)
+  case xs
+  | nil  => none(_)
+  | cons => case fn(xs.head) as got
+    | true  => some(_ xs.head)
+    | false => find(_ fn, xs.tail)
+
+// Filters a list
+filter(A; fn: A -> Bool, xs: List(A)) : List(A)
+  case xs
+  | nil  => nil(_)
+  | cons => case fn(xs.head) as got
+    with xs.tail : List(A)
+    | true  => cons(_ xs.head, xs.tail)
+    | false => cons(_ xs.head, filter(_ fn, xs.tail))
+
+// Returns the same list
+sames(A; xs : List(A)) : List(A)
+  case xs
+  | nil  => nil(_)
+  | cons => cons(_ xs.head, sames(_ xs.tail))
+
+// Applies a function to every element of a list
+map(A; B; fn: A -> B, xs: List(A)) : List(B)
+  case xs
+  | nil  => []
+  | cons => cons(_ fn(xs.head), map(__ fn, xs.tail))
+
+// Folds a list, converting it to its Church encoding
+fold(A; B; i: B, f: A -> B -> B, xs: List(A)) : B
+  case xs
+  | nil  => i
+  | cons => f(xs.head, fold(A; B; i, f, xs.tail))
+
+// Applies a function to every element of a list
+ziply(A; B; fs : List(A -> B), xs : List(A)) : List(B)
+  case fs
+  | nil  => nil(_)
+  | cons => case xs
+    | nil  => nil(_)
+    | cons => cons(_
+      fs.head(xs.head),
+      ziply(A; B; fs.tail, xs.tail))
+
+// Concatenates two lists
+concat(A; xs : List(A), ys : List(A)) : List(A)
+  case xs
+  with ys : List(A)
+  | nil  => ys
+  | cons => cons(_ xs.head, concat(_ xs.tail, ys))
+
+// Helper for reverse
+reverse.go(A; xs : List(A), rs : List(A)) : List(A)
+  case xs
+  with rs : List(A)
+  | nil  => rs
+  | cons => reverse.go(_ xs.tail, cons(A; xs.head, rs))
+
+// Reverses a list
+reverse(A; list : List(A)) : List(A)
+  reverse.go(A; list, nil(_))
+
+// Length of a list
+length(A; list : List(A)) : Nat
+  case list
+  | nil  => zero
+  | cons => succ(length(A; list.tail))
+
+// Internal
+generate.go(A; idx: Number, len: Number, gen: Number -> A)
+: List(A)
+  if idx === len then
+    []
+  else
+    cons(_ gen(idx), generate.go(A; idx + 1, len, gen))
+
+// Generates a list with a length and a generator function
+generate(A; len: Number, gen: Number -> A) : List(A)
+  generate.go(A; 0, len, gen)
+
+// O(1) concatenator
+Concat(A : Type) : Type
+  (x : List(A)) -> List(A)
+
+// Concatenates a O(1) concatenator
+concatenate(A; xs : Concat(A), ys : Concat(A)) : Concat(A)
+  (x) => xs(ys(x))
+
+// Converts a list to a O(1) concatenator
+list_to_concat(A; xs : List(A)) : Concat(A)
+  (x) => case xs
+    with x : List(A)
+    | nil  => x
+    | cons => cons(_ xs.head, list_to_concat(_ xs.tail, x))
+
+// Converts a O(1) concatenator to a list
+concat_to_list(A; xs : Concat(A)) : List(A)
+  xs(nil(_))
